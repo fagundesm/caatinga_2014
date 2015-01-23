@@ -26,7 +26,7 @@ madeira$cont_agua_mad <- (madeira$peso_fresco_mad-madeira$peso_seco_madeira)/mad
 #Casca
 madeira$cont_agua_casca <- (madeira$peso_fresco_casca-madeira$peso_seco_casca)/madeira$peso_seco_casca
 
-#Quantidade efetiva = porcentagem de água da capacidade de armazenamento (o quanto de água estava armazenado na seca)
+#Water content = porcentagem de água da capacidade de armazenamento (o quanto de água estava armazenado na seca)
 #Madeira
 madeira$efet_agua_mad <- madeira$cont_agua_mad/madeira$cap_arm_mad
 #Casca
@@ -35,53 +35,76 @@ madeira$efet_agua_casca <- madeira$cont_agua_casca/madeira$cap_arm_casca
 #Bark thickness= diam1+diam2/2
 madeira$thick_casca <- (madeira$diam_casca+madeira$diam2_casca)/2
 str (madeira)
-####################################################################################################
-####################################### Gráficos madeira ###########################################
-####################################################################################################
-g1 <- ggplot(madeira,aes(y=cap_arm_mad, x= reorder(especie, cap_arm_mad, FUN=median)))+
-  geom_boxplot();g1 
+
+     ####################################################################################################
+     ####################################### Gráficos madeira ###########################################
+     ####################################################################################################
+
+g1 <- ggplot(madeira,aes(  y=cap_arm_mad, x= reorder(especie, cap_arm_mad, FUN=median)))+
+  xlab("Species") + ylab("Wood Storage Capacity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  geom_boxplot(aes(fill=factor(madeira$especie)));g1 
 
 g2 <- ggplot(madeira,aes(y=efet_agua_mad, x=reorder (especie, efet_agua_mad, FUN=median)))+
-  geom_boxplot();g2
+  xlab("Species") + ylab("Wood Water content") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  geom_boxplot(aes(fill=factor(madeira$especie)));g2
 
 g3 <- ggplot(madeira,aes(y=dens_mad, x=reorder (especie,dens_mad, FUN=median)))+
-  geom_boxplot();g3
-####################################################################################################
-#########################################    Gráficos casca  ####################################### 
-####################################################################################################
+  xlab("Species") + ylab("Wood Density") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  geom_boxplot(aes(fill=factor(madeira$especie)));g3
+
+     ####################################################################################################
+     #########################################    Gráficos casca  ####################################### 
+     ####################################################################################################
 
 g4 <- ggplot(madeira,aes(y=cap_arm_casca, x=reorder (especie,cap_arm_casca,FUN=median)))+
-  geom_boxplot();g4
+  xlab("Species") + ylab("Bark Storage Capacity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  geom_boxplot(aes(fill=factor(madeira$especie)));g4
+
 g5 <- ggplot(madeira,aes(y=efet_agua_casca, x=reorder (especie,efet_agua_casca,FUN=median)))+
-  geom_boxplot();g5
+  xlab("Species") + ylab("Bark Water Content") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  geom_boxplot(aes(fill=factor(madeira$especie)));g5
+
 g6 <- ggplot(madeira,aes(y=dens_casca, x=reorder (especie,dens_casca,FUN=median)))+
-  geom_boxplot();g6
+  xlab("Species") + ylab("Bark Density") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  geom_boxplot(aes(fill=factor(madeira$especie)));g6
 
 
-####################################################################################################
-##############################              Correlação traits            ###########################
-####################################################################################################
+     ####################################################################################################
+     ##############################              Correlação traits            ###########################
+     ####################################################################################################
 
 cor_arm <- with(madeira, cor(cap_arm_mad, cap_arm_casca))
 g7 <- ggplot(madeira,aes(y=cap_arm_mad, x=cap_arm_casca))+
+  xlab("Bark Storage Capacity") + ylab("Wood Storage Capacity") +
   geom_point();g7
 
 cor_dens <-with(madeira, cor(dens_mad, dens_casca))
 g8 <- ggplot(madeira,aes(y=dens_mad, x=dens_casca))+
+  xlab("Wood Density") + ylab("Bark Density") +
   geom_point();g8
 
 cor_diam <- with(madeira, cor(diam_madeira_mm, thick_casca))
 g9 <- ggplot(madeira,aes(y=diam_madeira_mm, x=thick_casca))+
+  xlab("Bark Thickness") + ylab("Wood Diameter") +
   geom_point();g9
 
 cor_armdens <-  with(madeira, cor(cap_arm_mad,dens_mad))
 g10 <- ggplot(madeira,aes(y=cap_arm_mad, x=dens_mad))+
+  xlab("Wood Density") + ylab("Wood Storage Capacity") +
   geom_point();g10
 
 cor_armdensc <-  with(madeira, cor(cap_arm_casca,dens_casca))
 g11 <- ggplot(madeira,aes(y=cap_arm_casca, x=dens_casca))+
+  xlab("Bark Density") + ylab("Bark Storage Capacity") +
   geom_point();g11
 
 cor_armthick <- with(madeira, cor(cap_arm_mad,thick_casca))
 g12 <- ggplot(madeira,aes(y=cap_arm_mad, x=thick_casca))+
+  xlab("Bark Thickness") + ylab("Wood Storage Capacity") +
   geom_point();g12
