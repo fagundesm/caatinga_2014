@@ -156,3 +156,26 @@ c11<- with(madeira.med, cor.test(Mcap_arm_casca,Mdens_casca))
 # Capacidade de armazenamento da madeira X espessura da casca
 c12<- with(madeira.med, cor.test(Mcap_arm_mad,Mthick_casca))         #
 
+######################### Correlação traits X facilitação ###################3
+
+H <- read.csv("data/rii_traits.csv")
+str(H)
+m <- summarise(group_by (H,nurse),riim=mean(rii))
+str(H)
+
+teste <- lm(rii~Mdens_mad*Mcap_arm_mad*Mefet_agua_mad, H)
+anova(teste)
+summary (teste)
+
+#média por nurse, juntatando todas as targets 
+
+H2 <- data.frame(m, H[seq(1,60,3),-c(1:3)])
+a<-with (H2, cor.test(riim,Mdens_mad))
+qplot(y=rii, x=Mdens_mad, data=H)
+
+b<-with (H, cor.test(rii,Mefet_agua_mad))
+qplot(y=rii, x=Mefet_agua_mad, data=H)
+
+c<-with (H2, cor.test(riim,Mcap_arm_mad))
+qplot(y=rii, x=Mcap_arm_mad, data=H)
+
