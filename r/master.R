@@ -43,17 +43,17 @@ str (madeira)
 
 g1 <- ggplot(madeira,aes(  y=cap_arm_mad, x= reorder(especie, cap_arm_mad, FUN=median)))+
   xlab("Species") + ylab("Wood Storage Capacity") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15))+
   geom_boxplot(aes(fill=factor(madeira$especie)));g1 
 
 g2 <- ggplot(madeira,aes(y=efet_agua_mad, x=reorder (especie, efet_agua_mad, FUN=median)))+
   xlab("Species") + ylab("Wood Water content") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,size = 15))+
   geom_boxplot(aes(fill=factor(madeira$especie)));g2
 
 g3 <- ggplot(madeira,aes(y=dens_mad, x=reorder (especie,dens_mad, FUN=median)))+
   xlab("Species") + ylab("Wood Density") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15))+
   geom_boxplot(aes(fill=factor(madeira$especie)));g3
 
      ####################################################################################################
@@ -63,24 +63,21 @@ g3 <- ggplot(madeira,aes(y=dens_mad, x=reorder (especie,dens_mad, FUN=median)))+
 
 g4 <- ggplot(madeira,aes(y=cap_arm_casca, x=reorder (especie,cap_arm_casca,FUN=median)))+
   xlab("Species") + ylab("Bark Storage Capacity") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 15))+
   geom_boxplot(aes(fill=factor(madeira$especie)));g4
 
 g5 <- ggplot(madeira,aes(y=efet_agua_casca, x=reorder (especie,efet_agua_casca,FUN=median)))+
   xlab("Species") + ylab("Bark Water Content") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,size = 15))+
   geom_boxplot(aes(fill=factor(madeira$especie)));g5
 
 g6 <- ggplot(madeira,aes(y=dens_casca, x=reorder (especie,dens_casca,FUN=median)))+
   xlab("Species") + ylab("Bark Density") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,size = 15))+
   geom_boxplot(aes(fill=factor(madeira$especie)));g6
 
 
-     ####################################################################################################
-     ##############################             Gráficos Correlação traits    ###########################
-     ####################################################################################################
-
+     
 
 ### Tabela com médias por espécie (pacote dplyr):
 #Aqui eu tenho que fazer a média separada pq o boxplot já faz "sozinho". 
@@ -105,6 +102,29 @@ madeira.med <- summarise(group_by(madeira,especie),
                          Mcont_agua_casca=mean(cont_agua_casca),
                          Mefet_agua_mad=mean(efet_agua_mad),
                          Mefet_agua_casca=mean(efet_agua_casca))
+
+####################################################################################################
+##############################        Correlação traits X Facilitação    ###########################
+####################################################################################################
+
+H <- read.csv("data/rii_traits.csv")
+str(H)
+
+m <- summarise(group_by (H,nurse),riim=mean(rii))
+str(m)
+
+teste <- lm(rii~Mdens_mad*Mcap_arm_mad*Mefet_agua_mad, H)
+anova(teste)
+summary (teste)
+
+#########seleçao modelos
+teste1 <- update(teste, . ~ . - Mdens_mad:Mcap_arm_mad:Mefet_agua_mad)
+
+
+
+####################################################################################################
+##############################      Gráficos Correlação  entre traits    ###########################
+####################################################################################################
 
 cor_arm <- with(madeira.med, cor.test(Mcap_arm_mad, Mcap_arm_casca))
 g7 <- ggplot(madeira.med,aes(y=Mcap_arm_mad, x=Mcap_arm_casca))+
@@ -142,7 +162,10 @@ g12 <- ggplot(madeira.med,aes(y=Mcap_arm_mad, x=Mthick_casca))+
   geom_point()+
   geom_smooth(method=lm);g12
 
+######################################################################
 ######################### Testes de correlação #######################
+######################################################################
+
 # armazenamento da madeira X armazenamento da casca
 c7 <- with(madeira.med, cor.test(Mcap_arm_mad,Mcap_arm_casca))       #
 # Densidade da madeira X densidade da casca
@@ -156,18 +179,9 @@ c11<- with(madeira.med, cor.test(Mcap_arm_casca,Mdens_casca))
 # Capacidade de armazenamento da madeira X espessura da casca
 c12<- with(madeira.med, cor.test(Mcap_arm_mad,Mthick_casca))         #
 
-######################### Correlação traits X facilitação ###################3
-
-H <- read.csv("data/rii_traits.csv")
-str(H)
-m <- summarise(group_by (H,nurse),riim=mean(rii))
-str(H)
-
-teste <- lm(rii~Mdens_mad*Mcap_arm_mad*Mefet_agua_mad, H)
-anova(teste)
-summary (teste)
 
 #média por nurse, juntatando todas as targets 
+#FAZ SENTIDO? ASSIM RETIRA A ESPECIFICIDADE... (?)
 
 H2 <- data.frame(m, H[seq(1,60,3),-c(1:3)])
 a<-with (H2, cor.test(riim,Mdens_mad))
