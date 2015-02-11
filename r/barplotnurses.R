@@ -30,7 +30,7 @@ str(rii)
 mediafol <- summarise(group_by(rii, nurse, target),rii_medf=mean(folhas_rii))  
 
 ggfol<- ggplot(mediafol,aes(y=rii_medf,x=nurse,fill=factor(target)))+
-  xlab("Nurse") + ylab("RII") +
+  xlab("Nurse") + ylab("RII folha") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, size=15))+
   geom_bar(stat="identity",position="dodge"); ggfol
 
@@ -38,6 +38,6 @@ ggfol<- ggplot(mediafol,aes(y=rii_medf,x=nurse,fill=factor(target)))+
 mediaalt <- summarise(group_by(rii, nurse, target), rii_meda=mean(altura_rii))
 
 ggalt<- ggplot(mediaalt,aes(y=rii_meda,x=nurse,fill=factor(target)))+
-  xlab("Nurse") + ylab("RII") +
+  xlab("Nurse") + ylab("RII altura") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, size=15))+
   geom_bar(stat="identity",position="dodge"); ggalt
