@@ -3,7 +3,7 @@ library(ggplot2)
 library(dplyr)
 
 rii<- read.csv ("data/dados_media_facilitacao.csv",h=T)
-rii$bloco <- as.factor(rii$bloco)
+rii$plot <- as.factor(rii$plot)
 str(rii)
 
 #média por réplica
@@ -23,7 +23,7 @@ geom_bar(stat="identity",position="dodge")
 
 rii<- read.csv ("data/dados_RII.csv",h=T)
 rii$tempo <- as.factor(rii$tempo)
-rii$bloco <- NULL
+rii$plot <- NULL
 str(rii)
 
 #Folhas
@@ -41,3 +41,4 @@ ggalt<- ggplot(mediaalt,aes(y=rii_meda,x=nurse,fill=factor(target)))+
   xlab("Nurse") + ylab("RII altura") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, size=15))+
   geom_bar(stat="identity",position="dodge"); ggalt
+
