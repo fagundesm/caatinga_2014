@@ -4,6 +4,7 @@ tabela3$tempo <- as.factor(tabela3$tempo)
 tabela3$plot <- as.factor(tabela3$plot)
 tabela3$altura_imp <- NULL
 tabela3$folhas_imp<- NULL
+
 head(tabela3)
 str(tabela3)
 
@@ -13,7 +14,7 @@ str(indice)
 head(indice)
 
 # MANOVA 
-m1 <- manova(indice ~ nurse*target*tempo+Error(tempo/plot),data=tabela3)
+m1 <- manova(indice ~ nurse*target*tempo+Error(plot/target),data=tabela3) #Brewer sugeriu pra usar o erro assim.
 summary(m1)                                                       
 with(tabela3,summary.aov(manova(indice ~ nurse*target*tempo), p.adj = "bonferroni"))
 
@@ -32,13 +33,33 @@ summary(m2)
 with(tabelanova, summary.aov(manova(indice2 ~ nurse*target),p.adj = "bonferroni"))
 
 #Teste de anovas separadas do gustavo
-gualt <- aov(altura_rii ~ nurse*target*tempo+ Error(tempo/plot), data=tabela3)
+gualt <- aov(altura_rii ~ nurse*target +Error(tempo/(nurse*target)), data=tabela3)
 summary(gualt)
 
 gufol <- aov(folhas_rii ~ nurse*target*tempo+ Error(tempo/plot), data=tabela3)
 summary(gufol)
      
-                       ####################################
+##################### Anova com random effect sem p
+#Com log likelyhood ratio test: compara a diferença da deviance (tabela)
+#entre o modelo completo (rand) e os modelos sem variaveis (rand1, rand2, rand3) como se fosse seleção de modelos
+#mas em cada tabela ele me dá o P da variável (nurse, target ou nuser:target) sepadados 
+
+library(lme4)
+rand <- lmer(altura_rii ~ nurse*target + (1|tempo/plot), REML=F, data=tabela3)
+rand1 <- update(rand, ~. - nurse:target) # tirando interação nurse target
+rand2 <- update(rand, ~. - nurse - nurse:target)
+rand3 <- update(rand, ~. - target- nurse:target)
+summary(rand)
+anova(rand) 
+anova(rand1,rand) #Loglikelyhood ratio test nurse:target
+anova(rand, rand2)#Loglikelyhood ratio test nurse
+anova(rand, rand3)#Loglikelyhood ratio test targe
+
+plot(rand)
+
+
+
+####################################
                        ####### assumptions of MANOVA ######
                        #######         RII           ######
                        ####################################   
