@@ -1,13 +1,28 @@
 #Entrada de Dados
-tabela3 <- read.table("data/14_10_dados.txt", h=T)
-tabela3$tempo <- as.factor(tabela3$tempo)
+tabela3 <- read.csv("data/dados_rii_arrumados.csv", h=T)
 tabela3$plot <- as.factor(tabela3$plot)
-tabela3$altura_imp <- NULL
-tabela3$folhas_imp<- NULL
-
 head(tabela3)
 str(tabela3)
 
+##################### Anova com random effect sem p
+#Com log likelyhood ratio test: compara a diferença da deviance ( na tabela)
+#entre o modelo completo (rand) e os modelos sem variaveis (rand1, rand2, rand3) como se fosse seleção de modelos
+#mas em cada tabela ele me dá o P da variável (nurse, target ou nuser:target) sepadados 
+
+library(lme4)
+rand <- lmer(folha ~ nurse*target + (1|tempo/plot), REML=F, data=tabela3)
+rand1 <- update(rand, ~. - nurse:target) # tirando interação nurse target
+rand2 <- update(rand, ~. - nurse - nurse:target)
+rand3 <- update(rand, ~. - target- nurse:target)
+summary(rand)
+anova(rand) 
+anova(rand1,rand) #Loglikelyhood ratio test nurse:target
+anova(rand, rand2)#Loglikelyhood ratio test nurse
+anova(rand, rand3)#Loglikelyhood ratio test targe
+
+
+
+######################################################## MANOVA ################################################
 #grudando as variáveis Y
 indice <- with(tabela3, cbind(altura_rii, folhas_rii))
 str(indice)
@@ -18,48 +33,9 @@ m1 <- manova(indice ~ nurse*target*tempo+Error(plot/target),data=tabela3) #Brewe
 summary(m1)                                                       
 with(tabela3,summary.aov(manova(indice ~ nurse*target*tempo), p.adj = "bonferroni"))
 
-######### MANOVA SEM O TEMPO ##################
-tabelanova <- summarise(group_by(tabela3, nurse, target, plot), rii_medf=mean(folhas_rii), rii_medalt=mean(altura_rii))
-tabelanova$plot <- as.factor(tabela$plot)
-str(tabelanova)
-head(tabelanova)
-
-indice2 <- with(tabelanova, cbind(rii_medf, rii_medalt))
-str(indice2)
-
-head(indice2)
-m2 <- manova(indice2 ~ nurse*target+Error(plot), data=tabelanova)
-summary(m2)
-with(tabelanova, summary.aov(manova(indice2 ~ nurse*target),p.adj = "bonferroni"))
-
-#Teste de anovas separadas do gustavo
-gualt <- aov(altura_rii ~ nurse*target +Error(tempo/(nurse*target)), data=tabela3)
-summary(gualt)
-
-gufol <- aov(folhas_rii ~ nurse*target*tempo+ Error(tempo/plot), data=tabela3)
-summary(gufol)
-     
-##################### Anova com random effect sem p
-#Com log likelyhood ratio test: compara a diferença da deviance (tabela)
-#entre o modelo completo (rand) e os modelos sem variaveis (rand1, rand2, rand3) como se fosse seleção de modelos
-#mas em cada tabela ele me dá o P da variável (nurse, target ou nuser:target) sepadados 
-
-library(lme4)
-rand <- lmer(altura_rii ~ nurse*target + (1|tempo/plot), REML=F, data=tabela3)
-rand1 <- update(rand, ~. - nurse:target) # tirando interação nurse target
-rand2 <- update(rand, ~. - nurse - nurse:target)
-rand3 <- update(rand, ~. - target- nurse:target)
-summary(rand)
-anova(rand) 
-anova(rand1,rand) #Loglikelyhood ratio test nurse:target
-anova(rand, rand2)#Loglikelyhood ratio test nurse
-anova(rand, rand3)#Loglikelyhood ratio test targe
-
-plot(rand)
 
 
-
-####################################
+                       ####################################
                        ####### assumptions of MANOVA ######
                        #######         RII           ######
                        ####################################   

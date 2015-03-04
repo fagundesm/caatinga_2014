@@ -23,6 +23,7 @@ geom_bar(stat="identity",position="dodge")
 
 rii<- read.csv ("data/dados_RII.csv",h=T)
 rii$tempo <- as.factor(rii$tempo)
+rii$bloco <- as.factor(rii$bloco)
 rii$plot <- NULL
 str(rii)
 
